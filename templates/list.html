@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "_macros.html" import card, sortbar %}
+{% block title %}{{ site.get('seo',{}).get('list_title','전체 매물 | __BRAND__') }}{% endblock %}
+{% block desc %}{{ site.get('seo',{}).get('list_desc','__BRAND__ 전체 중고화물차 매물 {n}대').replace('{n}', total|string) }}{% endblock %}
+{% block main %}
+<div class="wrap">
+  <nav class="crumb" aria-label="현재 위치"><a href="{{ index_file }}">홈</a><span>전체 매물</span></nav>
+  <h1 class="page-h">전체 중고화물차 매물 <span class="count">{{ total }}대</span></h1>
+  {% for t, cs in by_type.items() %}
+  <section class="type-block" aria-labelledby="t-{{ loop.index }}">
+    <div class="type-block-h">
+      <h2 id="t-{{ loop.index }}" class="sec-h"><a href="{{ cs[0].type_file }}">{{ type_label.get(t, t) }}</a> <span class="count">{{ cs|length }}</span></h2>
+      <p class="muted">{{ type_blurb.get(t, '') }}</p>
+    </div>
+    <div class="grid" data-sortable>{% for c in cs[:per_type] %}{{ card(c) }}{% endfor %}</div>
+    {% if cs|length > per_type %}<p class="more"><a class="btn btn-ghost" href="{{ cs[0].type_file }}">{{ type_label.get(t, t) }} {{ cs|length }}대 모두 보기</a></p>{% endif %}
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% from "_icons.html" import icon %}
+{% macro card(c, eager=false) %}
+<article class="card" data-type="{{ c.type }}" data-ton="{{ c.ton_bucket }}" data-price="{{ c.price }}" data-km="{{ c.km }}" data-year="{{ c.year }}" data-tm="{{ c.tm }}" data-mk="{{ c.mkg }}" data-i="{{ c.idx }}" data-q="{{ (c.maker ~ c.model ~ c.ton ~ '톤' ~ c.type ~ c.title_hint ~ c.plate ~ c.year ~ c.ton_label)|replace(' ', '')|lower }}">
+  <a class="card-link" href="{{ c.file }}">
+    <div class="card-img">
+      <img src="{{ c.card_thumb }}" alt="{{ c.alts[c.cover - 1] }}" width="480" height="360"{% if not eager %} loading="lazy"{% endif %}>
+      <span class="card-type">{{ c.type }}</span>
+      <span class="card-pics">{{ icon('camera', 14) }}{{ c.n_photos }}</span>
+    </div>
+    <div class="card-body">
+      <h3 class="card-title">{{ c.maker }}{% if c.model %} {{ c.model }}{% endif %} {{ c.ton }}톤 {{ c.title_hint }}</h3>
+      <ul class="card-specs">
+        <li>{{ c.year }}년식</li><li>{{ c.km_txt }}</li><li>{{ c.tm }}</li>
+      </ul>
+      <div class="card-foot">
+        <p class="price"><strong>{{ '{:,}'.format(c.price) }}</strong><span>만원</span></p>
+        <span class="card-more">상세보기</span>
+      </div>
+    </div>
+  </a>
+</article>
+{% endmacro %}
+
+{% macro sortbar(n) %}
+<div class="sortbar" role="group" aria-label="정렬" data-sortbar>
+  <span class="sortbar-n">매물 <b>{{ n }}</b>대</span>
+  <div class="sortbar-btns">
+    <button type="button" class="sb on" data-sort="i-asc" aria-pressed="true">최근 등록순</button>
+    <button type="button" class="sb" data-sort="price-asc" aria-pressed="false">낮은 가격순</button>
+    <button type="button" class="sb" data-sort="price-desc" aria-pressed="false">높은 가격순</button>
+    <button type="button" class="sb" data-sort="km-asc" aria-pressed="false">주행거리 짧은순</button>
+    <button type="button" class="sb" data-sort="year-desc" aria-pressed="false">연식 최신순</button>
+  </div>
+</div>
+{% endmacro %}

@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+dist/
+data/cand/
+data/sheets/

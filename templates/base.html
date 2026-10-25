@@ -1,0 +1,94 @@
+{% from "_icons.html" import icon %}
+{% set bare = (mode == 'preview' and page_file == index_file) %}
+{% if not bare %}<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+{% endif %}
+<title>{% block title %}{% endblock %}</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="{% block desc %}{% endblock %}">
+{% if mode == 'site' %}
+<meta name="robots" content="{{ 'noindex, follow' if noindex else 'index, follow, max-image-preview:large, max-snippet:-1' }}">
+<link rel="alternate" type="application/rss+xml" title="__BRAND__ 매물" href="{{ site.domain }}/rss.xml">
+<link rel="canonical" href="{{ site.domain }}/{{ '' if page_file == 'index.html' else page_file }}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ site.name }}">
+<meta property="og:title" content="{{ self.title() }}">
+<meta property="og:description" content="{{ self.desc() }}">
+{% block og %}<meta property="og:image" content="{{ site.domain }}/img/og.jpg">{% endblock %}
+{% if site.naver_site_verification %}<meta name="naver-site-verification" content="{{ site.naver_site_verification }}">{% endif %}
+{% if site.google_site_verification %}<meta name="google-site-verification" content="{{ site.google_site_verification }}">{% endif %}
+{% endif %}
+<link rel="preconnect" href="__IMGHOST__">
+{# 한글 웹폰트는 PC에서만, 화면을 막지 않게 늦게 불러온다. 휴대폰은 기본 글꼴(노토 산스)을 바로 사용 #}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" media="print" onload="this.media='(min-width: 861px)'">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/favicon.png">
+<link rel="stylesheet" href="style.css?v={{ asset_v }}">
+<script type="application/ld+json">{{ jsonld(dealer_ld)|safe }}</script>
+{% block ld %}{% endblock %}
+{% if mode == 'site' and site.ga4_id %}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.ga4_id }}"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','{{ site.ga4_id }}');{% if site.google_ads_id %}gtag('config','{{ site.google_ads_id }}');{% endif %}</script>
+{% endif %}
+{% if not bare %}
+</head>
+<body>
+{% endif %}
+<a class="skip" href="#main">본문 바로가기</a>
+<div class="util">
+  <div class="wrap util-in">
+    <p><span>{{ icon('clock', 14) }} 전화 상담 24시간</span><span class="hide-s">{{ icon('truck', 14) }} 전국 출장 매입</span><span class="hide-s">{{ icon('shield', 14) }} {{ site.dealer.union }} 등록 종사원</span></p>
+  </div>
+</div>
+<header class="top">
+  <div class="wrap top-in">
+    <a class="logo" href="{{ index_file }}" aria-label="{{ site.name }} 홈">
+      <img class="logo-img" src="img/logo.webp" alt="__BRAND__" width="260" height="54">
+    </a>
+    <nav class="gnb" aria-label="주요 메뉴">
+      <a href="{{ index_file }}#finder">내차사기</a>
+      <a href="{{ sell_file }}"{% if page_file == sell_file %} aria-current="page"{% endif %}>내차팔기</a>
+      <a href="{{ guide_file }}"{% if page_file == guide_file %} aria-current="page"{% endif %}>가이드</a>
+    </nav>
+    <a class="top-call" href="tel:{{ site.phone_tel }}">{{ icon('phone', 18) }}<span>{{ site.phone }}</span></a>
+  </div>
+</header>
+
+<main id="main">
+{% block main %}{% endblock %}
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <a class="logo logo-inv" href="{{ index_file }}"><span class="logo-mark" aria-hidden="true">{{ icon('truck', 22) }}</span><span class="logo-text"><strong>__BRAND__</strong><small>중고화물차 · 특장차 매매</small></span></a>
+      <p class="foot-phone">{{ site.phone }}</p>
+      <p class="foot-hours">{{ site.hours }}</p>
+    </div>
+    <dl class="foot-biz">
+      {% if site.biz.ad_name %}<div><dt>광고 책임</dt><dd>{{ site.biz.ad_name }} · 대표 {{ site.biz.ad_ceo }}{% if site.biz.ad_bizno %} · 사업자등록번호 {{ site.biz.ad_bizno }}{% endif %}</dd></div>{% endif %}
+      <div><dt>소속 매매상사</dt><dd>{{ site.biz.shop_name }} · 대표 {{ site.biz.shop_ceo }}{% if site.biz.shop_bizno %} · 사업자등록번호 {{ site.biz.shop_bizno }}{% endif %}</dd></div>
+      <div><dt>자동차관리사업등록</dt><dd>{{ site.biz.shop_regno }}</dd></div>
+      <div><dt>주소</dt><dd>{{ site.biz.shop_addr }}</dd></div>
+      <div><dt>담당 종사원</dt><dd>{{ site.dealer.name }} · 사원증번호 {{ site.dealer.card_no }} · {{ site.dealer.union }}</dd></div>
+    </dl>
+  </div>
+  <p class="wrap copy">© {{ today[:4] }} {{ site.name }}. 매물 정보는 판매상사 제공 자료와 성능·상태점검기록부를 기준으로 합니다.</p>
+</footer>
+
+<div class="dock" role="region" aria-label="빠른 상담">
+  <a class="dock-call" href="tel:{{ site.phone_tel }}">{{ icon('phone', 26) }}<span class="dock-txt"><span>전화 상담</span><b>{{ site.phone }}</b></span></a>
+  <a class="dock-sms" href="sms:{{ site.phone_tel }}?body={{ sms_body|urlencode }}&amp;body={{ sms_body|urlencode }}">{{ icon('sms', 22) }} 문자</a>
+</div>
+<script src="app.js?v={{ asset_v }}"></script>
+{% if mode == 'site' and site.naver_wcs_id %}
+<script src="//wcs.pstatic.net/wcslog.js"></script>
+<script>if(!wcs_add)var wcs_add={};wcs_add["wa"]="{{ site.naver_wcs_id }}";if(window.wcs){wcs_do();}</script>
+{% endif %}
+{% if not bare %}
+</body>
+</html>
+{% endif %}

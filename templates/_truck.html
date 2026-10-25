@@ -1,0 +1,1 @@
+{% macro truck(t) %}{% set k = art.get(t, 'cargo') %}{% if k in art_photo %}<img class="ill ill-photo" src="img/types/{{ k }}.webp" alt="" width="600" height="360" loading="lazy">{% else %}<img class="ill" src="img/types/{{ k }}.svg" alt="" width="240" height="120" loading="lazy">{% endif %}{% endmacro %}

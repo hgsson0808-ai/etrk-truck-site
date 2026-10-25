@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% from "_macros.html" import card %}
+{% from "_icons.html" import icon %}
+{% block title %}{% if sold %}[판매완료] {{ c.seo_title }}{% else %}{{ c.seo_title }} {{ c.price_txt }}{% endif %} | __BRAND__{% endblock %}
+{% block desc %}{{ c.meta }}{% endblock %}
+{% block og %}<meta property="og:image" content="{{ c.imgs[c.cover - 1] }}">{% endblock %}
+{% block ld %}
+{% set imgs = c.imgs %}
+<script type="application/ld+json">{{ jsonld({"@context":"https://schema.org","@type":"Car","name":c.seo_title,"description":c.meta,"url":site.domain ~ "/" ~ c.file,"image":imgs,"brand":{"@type":"Brand","name":(c.maker or "국산")},"model":c.model,"vehicleModelDate":c.year,"fuelType":c.fuel,"vehicleTransmission":c.tm,"color":c.color,"itemCondition":"https://schema.org/UsedCondition","mileageFromOdometer":{"@type":"QuantitativeValue","value":c.km,"unitCode":"KMT"},"offers":{"@type":"Offer","price":c.price * 10000,"priceCurrency":"KRW","availability":("https://schema.org/SoldOut" if sold else "https://schema.org/InStock"),"seller":{"@id":site.domain ~ "#dealer"}}})|safe }}</script>
+<script type="application/ld+json">{{ jsonld({"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"홈","item":site.domain ~ "/"},{"@type":"ListItem","position":2,"name":c.type,"item":site.domain ~ "/" ~ c.type_file},{"@type":"ListItem","position":3,"name":c.seo_title}]})|safe }}</script>
+{% set qa = [] %}{% for f in c.faq %}{% set _ = qa.append({"@type":"Question","name":f.q,"acceptedAnswer":{"@type":"Answer","text":f.a}}) %}{% endfor %}
+<script type="application/ld+json">{{ jsonld({"@context":"https://schema.org","@type":"FAQPage","mainEntity":qa})|safe }}</script>
+{% endblock %}
+{% block main %}
+<div class="wrap">
+  <nav class="crumb" aria-label="현재 위치"><a href="{{ index_file }}">홈</a><a href="{{ c.type_file }}">{{ c.type }}</a><a href="{{ c.ton_file }}">{{ c.ton_label }}</a><span>{{ c.year }}년식</span></nav>
+  {% if sold %}
+  <div class="sold-banner" role="status">
+    <strong>판매가 완료된 차량입니다</strong>
+    <p>같은 {{ c.type }} 매물을 찾으시면 아래 매물을 보시거나 전화 주세요. 전국 매물에서 맞는 차를 찾아 드립니다.</p>
+    <div class="sold-actions"><a class="btn btn-yellow" href="tel:{{ site.phone_tel }}">{{ icon('phone', 18) }} {{ site.phone }}</a><a class="btn btn-ghost" href="{{ c.type_file }}">{{ c.type }} 매물 보기</a></div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="wrap car-top">
+  <section class="gallery" aria-label="차량 사진 {{ c.n_photos }}장" data-gallery>
+    <div class="g-stage">
+      <div class="g-track" tabindex="0">
+        {% for i in range(1, c.n_photos + 1) %}
+        <figure class="g-slide"><img src="{{ c.imgs[i - 1] }}" alt="{{ c.alts[i - 1] }}" width="1280" height="960"{% if i > 1 %} loading="lazy"{% endif %}></figure>
+        {% endfor %}
+      </div>
+      <button type="button" class="g-nav g-prev" data-g-step="-1" aria-label="이전 사진">{{ icon('arrow-l', 22) }}</button>
+      <button type="button" class="g-nav g-next" data-g-step="1" aria-label="다음 사진">{{ icon('arrow-r', 22) }}</button>
+      <p class="g-count">{{ icon('camera', 14) }} <span data-g-now>1</span> / {{ c.n_photos }}</p>
+    </div>
+    <div class="g-thumbs">
+      {% for i in range(1, c.n_photos + 1) %}
+      <button type="button" class="g-thumb" data-g-go="{{ i - 1 }}" aria-label="사진 {{ i }} 보기"><img src="{{ c.thumbs[i - 1] }}" alt="" loading="lazy" width="120" height="90"></button>
+      {% endfor %}
+    </div>
+
+    {% if c.youtube %}
+    <div class="vid" aria-label="매물 영상">
+      <button type="button" class="vid-yt" data-yt="{{ c.youtube }}" aria-label="{{ c.seo_title }} 영상 재생">
+        <img src="https://i.ytimg.com/vi/{{ c.youtube }}/hqdefault.jpg" alt="" loading="lazy" width="480" height="360">
+        <span class="vid-play">{{ icon('play', 30) }}</span>
+      </button>
+    </div>
+    {% else %}
+    {% set heads = {} %}{% for s in c.sections %}{% set _ = heads.update({s.photo: s.heading}) %}{% endfor %}
+    <div class="vid vid-show" data-show aria-label="매물 사진 영상 ({{ c.n_photos }}장, 장당 3초)">
+      <div class="vs-stage">
+        {% for i in range(1, c.n_photos + 1) %}
+        <figure class="vs-f{% if loop.first %} on{% endif %}"><img {% if loop.first %}src{% else %}data-src{% endif %}="{{ c.imgs[i - 1] }}" alt="" width="1024" height="768"><figcaption>{{ heads.get(i, '') }}</figcaption></figure>
+        {% endfor %}
+        <figure class="vs-f vs-end">
+          <p class="vs-end-name">{{ c.maker }}{% if c.model %} {{ c.model }}{% endif %} {{ c.ton }}톤 {{ c.type }}</p>
+          <p class="vs-end-price">{% if sold %}판매완료{% else %}{{ c.price_txt }}{% endif %}</p>
+          <p class="vs-end-brand">__BRAND__ · 24시간 상담</p>
+          <a class="vs-end-tel" href="tel:{{ site.phone_tel }}">{{ icon('phone', 20) }} {{ site.phone }}</a>
+        </figure>
+        <button type="button" class="vs-btn" data-vs-toggle aria-label="일시정지">{{ icon('pause', 18) }}{{ icon('play', 18) }}</button>
+      </div>
+      <div class="vs-bar" aria-hidden="true">{% for i in range(c.n_photos + 1) %}<span><i></i></span>{% endfor %}</div>
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="summary" aria-labelledby="car-h">
+    <p class="tags"><span class="tag tag-navy">{{ c.type }}</span><span class="tag">{{ c.ton }}톤</span>{% if sold %}<span class="tag">판매완료</span>{% endif %}</p>
+    <h1 id="car-h">{{ c.headline }}</h1>
+    {% if sold %}<p class="price price-lg price-sold"><strong>판매완료</strong></p>{% else %}<p class="price price-lg"><strong>{{ '{:,}'.format(c.price) }}</strong><span>만원</span></p>{% endif %}
+    <dl class="keys">
+      <div><dt>연식</dt><dd>{{ c.year }}년식</dd></div>
+      <div><dt>주행거리</dt><dd>{{ c.km_txt }}</dd></div>
+      <div><dt>변속기</dt><dd>{{ c.tm }}</dd></div>
+      <div><dt>연료</dt><dd>{{ c.fuel }}</dd></div>
+      <div><dt>압류·저당</dt><dd>{{ c.seizure }} / {{ c.mortgage }}</dd></div>
+      <div><dt>차량번호</dt><dd>{{ c.plate }}</dd></div>
+    </dl>
+    <section class="spec-main" aria-labelledby="specm-h">
+      <h2 id="specm-h">주요 제원</h2>
+      <dl>
+        {% for k, v in c.spec_main %}<div class="{{ 'ask' if v == '전화 문의' else '' }}{{ ' wide' if k in ('특이사항', '옵션') or v|length > 12 or k|length > 7 else '' }}"><dt>{{ k }}</dt><dd>{% if v == "전화 문의" %}<a href="tel:{{ site.phone_tel }}">전화 문의</a>{% else %}{{ v }}{% endif %}</dd></div>{% endfor %}
+      </dl>
+    </section>
+    <div class="cta-col">
+      <a class="btn btn-yellow btn-lg" href="tel:{{ site.phone_tel }}">{{ icon('phone', 20) }} 전화 상담 {{ site.phone }}</a>
+      <a class="btn btn-ghost" href="sms:{{ site.phone_tel }}?body={{ sms_body|urlencode }}&amp;body={{ sms_body|urlencode }}">{{ icon('sms', 18) }} 문자로 문의하기</a>
+    </div>
+    <a class="perf-link" href="{{ c.perf_url }}" target="_blank" rel="noopener">{{ icon('doc', 18) }}<span>성능·상태점검기록부 보기<small>성능번호 {{ c.perfNo }}</small></span></a>
+    <p class="mini-dealer">{{ icon('user', 16) }} 담당 {{ site.dealer.name }} · 사원증 {{ site.dealer.card_no }}</p>
+  </section>
+</div>
+
+<div class="wrap car-body">
+  <article class="story" aria-labelledby="story-h">
+    <h2 id="story-h" class="sec-h">차량 상세 설명</h2>
+    <p class="story-note">{% if c.sections %}사진 {{ c.sections|length }}장에 담긴 내용을 하나씩 설명합니다. · {% endif %}<time datetime="{{ c.lastmod }}">최종 수정 {{ c.lastmod }}</time></p>
+    <p class="story-lead">{{ c.intro }}</p>
+    {% if not c.sections and c.seller %}
+    <section class="seller-note" aria-labelledby="seller-h">
+      <h3 id="seller-h">판매자 설명</h3>
+      <dl>{% for k, v in c.seller %}<div{% if not k %} class="free"{% endif %}>{% if k %}<dt>{{ k }}</dt>{% endif %}<dd>{{ v }}</dd></div>{% endfor %}</dl>
+    </section>
+    {% endif %}
+    {% for s in c.sections %}
+    {% if loop.first %}<h3 class="story-title">{{ c.headline }}</h3>{% endif %}
+    <section class="story-step">
+      <h3>{{ s.heading }}</h3>
+      <figure><img src="{{ c.imgs[s.photo - 1] }}" alt="{{ c.alts[s.photo - 1] }}" loading="lazy" width="1280" height="960"><figcaption>{{ c.maker }} {{ c.model }} {{ c.ton }}톤 {{ c.type }} · {{ s.heading }}</figcaption></figure>
+      <p>{{ s.text }}</p>
+    </section>
+    {% endfor %}
+    <p class="story-end">{{ c.outro }}</p>
+
+    <section class="faq" aria-labelledby="faq-h">
+      <h2 id="faq-h" class="sec-h">자주 묻는 질문</h2>
+      {% for f in c.faq %}
+      <details{% if loop.first %} open{% endif %}><summary>{{ f.q }}</summary><p>{{ f.a }}</p></details>
+      {% endfor %}
+    </section>
+  </article>
+
+  <aside class="side">
+    <section class="spec" aria-labelledby="spec-h">
+      <h2 id="spec-h" class="sec-h">등록 정보</h2>
+      <dl class="reg-grid">
+        <div><dt>제조사·모델</dt><dd>{{ c.maker }}{% if c.model %} {{ c.model }}{% endif %}</dd></div>
+        <div><dt>차종</dt><dd>{{ type_label.get(c.type, c.type) }} ({{ c.title_hint }})</dd></div>
+        <div><dt>연식</dt><dd>{{ c.year }}년식</dd></div>
+        <div><dt>최초등록일</dt><dd class="num">{{ c.firstReg }}</dd></div>
+        <div><dt>연료</dt><dd>{{ c.fuel }}</dd></div>
+        <div><dt>색상</dt><dd>{{ c.color }}</dd></div>
+        <div><dt>압류 / 저당</dt><dd>{{ c.seizure }} / {{ c.mortgage }}</dd></div>
+        <div><dt>세금 미납</dt><dd class="num">{{ c.tax }}</dd></div>
+        <div><dt>제시번호</dt><dd class="num">{{ c.presentNo }}</dd></div>
+        <div><dt>성능번호</dt><dd class="num"><a href="{{ c.perf_url }}" target="_blank" rel="noopener">{{ c.perfNo }}</a></dd></div>
+        <div><dt>사고 정보</dt><dd>성능점검기록부 참조</dd></div>
+        <div><dt>판매 방식</dt><dd>알선판매{% if c.saleShop %} <span class="tip" data-tip><button type="button" class="tip-q" aria-label="판매상사 보기" aria-expanded="false">?</button><span class="tip-box" role="tooltip">판매상사 : {{ c.saleShop }}</span></span>{% endif %}</dd></div>
+      </dl>
+    </section>
+
+    <section class="dealer" aria-labelledby="dealer-h">
+      <h2 id="dealer-h" class="sec-h">담당 딜러</h2>
+      <div class="dealer-head"><span class="avatar" aria-hidden="true">{{ site.dealer.name[0] }}</span><p class="dealer-name">{{ site.dealer.name }} <span class="badge">{{ icon('check', 12) }} 정식 등록 종사원</span></p></div>
+      <dl>
+        <div><dt>사원증번호</dt><dd class="num">{{ site.dealer.card_no }}</dd></div>
+        <div><dt>소속 상사</dt><dd>{{ site.dealer.shop }}</dd></div>
+        <div><dt>조합</dt><dd>{{ site.dealer.union }} {{ site.dealer.union_tel }}</dd></div>
+        <div><dt>상사 위치</dt><dd>{{ site.dealer.address }}</dd></div>
+        <div><dt>연락처</dt><dd class="num">{{ site.phone }}</dd></div>
+      </dl>
+      <a class="btn btn-yellow" href="tel:{{ site.phone_tel }}">{{ icon('phone', 18) }} {{ site.phone }}</a>
+    </section>
+  </aside>
+</div>
+
+<section class="wrap similar" aria-labelledby="sim-h">
+  <h2 id="sim-h" class="sec-h">{{ "지금 판매 중인 비슷한 매물" if sold else "함께 보면 좋은 매물" }}</h2>
+  <div class="grid">{% for x in similar %}{{ card(x) }}{% endfor %}</div>
+</section>
+{% endblock %}

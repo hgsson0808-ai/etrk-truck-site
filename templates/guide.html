@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{% if g %}{{ g.title }} | __BRAND__{% else %}중고화물차 구매·판매 가이드 | __BRAND__{% endif %}{% endblock %}
+{% block desc %}{% if g %}{{ g.desc }}{% else %}중고 화물차·트럭을 사고팔 때 필요한 정보를 질문과 답으로 정리했습니다. 톤수 고르기, 점검 항목, 매각 절차를 확인하세요.{% endif %}{% endblock %}
+{% block ld %}{% if g %}
+{% set qa = [] %}{% for s in g.sections %}{% set _ = qa.append({"@type":"Question","name":s.q,"acceptedAnswer":{"@type":"Answer","text":s.a|join(' ')}}) %}{% endfor %}
+<script type="application/ld+json">{{ jsonld({"@context":"https://schema.org","@type":"Article","headline":g.title,"description":g.desc,"dateModified":today,"author":{"@type":"Organization","name":site.name},"publisher":{"@type":"Organization","name":site.name},"mainEntityOfPage":site.domain ~ "/" ~ page_file[:-5]})|safe }}</script>
+<script type="application/ld+json">{{ jsonld({"@context":"https://schema.org","@type":"FAQPage","mainEntity":qa})|safe }}</script>
+{% endif %}{% endblock %}
+{% block main %}
+<div class="wrap guide">
+  <nav class="crumb" aria-label="현재 위치"><a href="{{ index_file }}">홈</a>{% if g %}<a href="{{ guide_file }}">가이드</a><span>{{ g.title }}</span>{% else %}<span>가이드</span>{% endif %}</nav>
+  {% if g %}
+  <h1 class="page-h">{{ g.title }}</h1>
+  <p class="g-date">{{ site.name }} · 최종 수정 {{ today }}</p>
+  <p class="g-lead">{{ g.lead }}</p>
+  {% for s in g.sections %}
+  <section class="g-sec">
+    <h2>{{ s.q }}</h2>
+    {% for p in s.a %}<p>{{ p }}</p>{% endfor %}
+    {% if s.table %}<div class="g-table"><table><thead><tr>{% for h in s.table.head %}<th scope="col">{{ h }}</th>{% endfor %}</tr></thead><tbody>{% for r in s.table.rows %}<tr>{% for v in r %}<{{ 'th scope="row"' if loop.first else 'td' }}>{{ v }}</{{ 'th' if loop.first else 'td' }}>{% endfor %}</tr>{% endfor %}</tbody></table></div>{% endif %}
+  </section>
+  {% endfor %}
+  <aside class="notice">
+    <h2>지금 판매 중인 {{ g.type }} 매물 보기</h2>
+    <p>가격·연식·주행거리를 바로 비교하실 수 있습니다. 궁금한 점은 전화로 편하게 물어보세요.</p>
+    <a class="btn btn-yellow" href="{{ type_file_of[g.type] }}">중고 {{ g.type }} 매물 보기</a>
+    <a class="btn" href="tel:{{ site.phone_tel }}"><b>{{ site.phone }}</b> 전화 상담</a>
+  </aside>
+  {% else %}
+  <h1 class="page-h">중고화물차 구매·판매 가이드</h1>
+  <p class="g-lead">중고 화물차·트럭을 사고팔 때 궁금한 점을 질문과 답으로 정리했습니다.</p>
+  <ul class="g-list">{% for x in guides %}<li><a href="{{ x.file }}"><strong>{{ x.title }}</strong><span>{{ x.desc }}</span></a></li>{% endfor %}</ul>
+  {% endif %}
+  {% if g and others %}<section class="g-sec"><h2>다른 가이드도 읽어 보세요</h2><ul class="g-list">{% for x in others %}<li><a href="{{ x.file }}"><strong>{{ x.title }}</strong></a></li>{% endfor %}</ul></section>{% endif %}
+</div>
+{% endblock %}

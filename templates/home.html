@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% from "_macros.html" import card %}
+{% from "_icons.html" import icon %}
+{% from "_truck.html" import truck with context %}
+{% block title %}{% if mode == "preview" %}__BRAND__ 광고 홈페이지{% else %}{{ site.get('seo',{}).get('home_title','중고화물차 매매·매입 | __BRAND__') }}{% endif %}{% endblock %}
+{% block desc %}{{ site.get('seo',{}).get('home_desc','중고화물차·중고트럭 매매와 매입은 __BRAND__. 전국 출장 매입, 24시간 상담') }} {{ site.phone }}{% endblock %}
+{% block main %}
+<h1 class="vh">{{ site.get('seo',{}).get('home_h1','중고화물차·중고트럭 매매와 매입 | __BRAND__') }}</h1>
+
+{% set slides = [
+  {"img": "1", "alt": "__BRAND__ 매물 5톤 카고", "h": "1톤 특장차부터<br>25톤 카고까지", "sub": "매물마다 차량번호, 압류·저당, 성능점검기록부를 그대로 공개합니다.", "a": ["#stock", "매물 보기"]},
+  {"img": "2", "alt": "__BRAND__ 매물 3.5톤 냉동탑", "h": "냉동탑·윙바디<br>전문 매매", "sub": "2.5톤부터 대형까지 탑차·윙바디 매물을 사진과 함께 공개합니다.", "a": [type_file_of["냉동탑"], "탑차 매물 보기"]},
+  {"img": "3", "alt": "__BRAND__ 매물 3.5톤 윙바디", "h": "타던 화물차,<br>시세부터 받아 보세요", "sub": "전국 어디든 찾아가 차를 직접 보고 매입합니다. 특장차·고주행 차도 상담해 드립니다.", "a": [sell_file, "내차팔기 문의"]},
+  {"img": "4", "alt": "__BRAND__ 매물 3.5톤 덤프", "h": "덤프부터 집게차까지,<br>특장차 매입·매매 전문", "sub": "카고크레인·탱크로리·진개차까지, 1톤 특장차부터 대형 특장차까지 사고팝니다.", "a": ["#finder", "차종별로 보기"]},
+  {"img": "5", "alt": "__BRAND__ 매물 5톤 카고크레인", "h": "100% 실매물<br>성능기록부 공개", "sub": "판매하는 모든 차량의 성능점검기록부를 발급해 드리고, 할부·위탁판매 상담도 가능합니다. 전화 상담은 24시간 받습니다.", "a": ["tel:" ~ site.phone_tel, "지금 전화하기"]},
+] %}
+<section class="hero2" aria-roledescription="carousel" aria-label="__BRAND__ 소개" data-banner>
+  <div class="h2-track" data-bn-track>
+    {% for s in slides %}
+    <div class="h2-slide h2-s{{ s.img }}" role="group" aria-roledescription="slide" aria-label="{{ loop.index }} / {{ slides|length }}">
+      <picture>
+        <source media="(max-width: 860px)" srcset="img/hero-{{ s.img }}-m.webp?v={{ hero_v }}">
+        <img class="hero2-bg" src="img/hero-{{ s.img }}.webp?v={{ hero_v }}" alt="{{ s.alt }}" width="1024" height="768"{% if loop.first %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>
+      </picture>
+      <div class="wrap hero2-in">
+        <p class="hero2-cred">{{ icon('shield', 16) }}<span>{{ site.dealer.union }} 등록 매매종사원 {{ site.dealer.name }}</span></p>
+        <p class="hero2-h">{{ s.h|safe }}</p>
+        <p class="hero2-sub">{{ s.sub }}</p>
+        <p class="hero2-cta">
+          <a class="btn hero2-btn" href="{{ s.a[0] }}">{{ s.a[1] }}</a>
+          <a class="btn hero2-tel" href="tel:{{ site.phone_tel }}">{{ icon('phone', 18) }} {{ site.phone }}</a>
+        </p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="h2-dots" role="tablist" aria-label="대표 사진 선택">
+    {% for s in slides %}<button type="button" class="bn-dot{% if loop.first %} on{% endif %}" data-bn-go="{{ loop.index0 }}" aria-label="{{ loop.index }}번째 사진"></button>{% endfor %}
+  </div>
+  <div class="hero2-bar">
+    <ul class="wrap">
+      {% set ics = ['grid','clock','truck','shield'] %}
+      {% for h, s in site.promises %}<li>{{ icon(ics[loop.index0], 18) }}<span>{{ h }}</span></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="finder" id="finder" aria-label="매물 찾기">
+  <div class="wrap">
+    <div class="panel">
+      <div class="panel-tabs">
+        <span class="ptab on">{{ icon('grid', 18) }} 차종 바로찾기</span>
+        <a class="ptab" href="{{ sell_file }}">{{ icon('truck', 18) }} 내차팔기 상담</a>
+      </div>
+      <form class="qbox" id="search" role="search" aria-label="매물 검색">
+        <span class="qbox-ic">{{ icon('search', 20) }}</span>
+        <label class="vh" for="q">매물 검색</label>
+        <input id="q" name="q" type="search" placeholder="차종·제조사·톤수·차량번호 (예: 5톤 카고, 마이티)" autocomplete="off" enterkeyhint="search">
+        <button class="qbox-btn" type="submit">{{ icon('search', 16) }} 검색</button>
+      </form>
+      <ul class="tiles">
+        {% for g, items in groups %}{% for t, n, f in items %}
+        <li><a class="tile{% if not n %} tile-empty{% endif %}" href="{{ f }}" title="{{ g }} · {{ t }}">
+          <span class="tile-ill tile-cat"><img src="{{ type_img[t] }}" alt="{{ type_label[t] }}" width="311" height="157" loading="lazy"></span>
+          <span class="tile-name">{{ type_label[t] }}</span><span class="tile-n">{% if n %}{{ n }}대{% else %}찾아드림{% endif %}</span>
+        </a></li>
+        {% endfor %}{% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="stock" id="stock" aria-labelledby="stock-h">
+  <div class="wrap">
+    <div class="stock-head">
+      <h2 id="stock-h">전체 매물 <span class="count"><span data-count>{{ total }}</span>대</span></h2>
+      <div class="chipset" role="group" aria-label="정렬">
+        <button type="button" class="ch on" data-sort="i-asc">최근순</button>
+        <button type="button" class="ch" data-sort="price-asc">낮은 가격순</button>
+        <button type="button" class="ch" data-sort="price-desc">높은 가격순</button>
+        <button type="button" class="ch" data-sort="km-asc">주행거리순</button>
+        <button type="button" class="ch" data-sort="year-desc">연식순</button>
+      </div>
+    </div>
+    <div class="chipset chipset-ton" role="group" aria-label="톤수">
+      <button type="button" class="ch2 on" data-ton="">전체 톤수</button>
+      <button type="button" class="ch2" data-ton="1">1톤</button>
+      <button type="button" class="ch2" data-ton="2.5">2.5톤</button>
+      <button type="button" class="ch2" data-ton="3.5">3.5톤</button>
+      <button type="button" class="ch2" data-ton="5">4.5~5톤</button>
+      <button type="button" class="ch2" data-ton="L">5톤 이상</button>
+    </div>
+    <p class="q-state" data-q-state hidden>“<b data-q-text></b>” 검색 결과 <button type="button" class="q-clear" data-q-clear>검색 지우기</button></p>
+    <div class="grid" data-grid data-total="{{ total }}">
+      {% for c in cars %}{{ card(c, eager=loop.index <= 4) }}{% endfor %}
+    </div>
+    <p class="empty" data-empty hidden>조건에 맞는 매물이 없습니다. 찾는 차를 말씀해 주시면 전국 매물에서 찾아 연락드립니다. <a href="tel:{{ site.phone_tel }}">{{ site.phone }}</a></p>
+    <p class="more" data-more><a class="btn btn-ghost" href="{{ list_file }}">최근 매물 {{ cars|length }}대 외 {{ total - cars|length }}대 더 보기</a></p>
+  </div>
+</section>
+
+<section class="why" aria-labelledby="why-h">
+  <div class="wrap">
+    <div class="sec-head sec-head-inv">
+      <h2 id="why-h">__BRAND__이 약속하는 네 가지</h2>
+    </div>
+    <ul class="why-list">
+      {% set ics = ['grid','clock','truck','shield'] %}
+      {% for h, s in site.promises %}
+      <li><span class="why-ic">{{ icon(ics[loop.index0], 26) }}</span><strong>{{ h }}</strong><span>{{ s }}</span></li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="sellband">
+  <div class="wrap sellband-in">
+    <div>
+      <h2>타던 화물차, 시세부터 받아 보세요</h2>
+      <p>차량번호와 주행거리만 알려 주시면 됩니다. 특장차·노후차·고주행 차도 매입합니다.</p>
+    </div>
+    <div class="sellband-cta">
+      <a class="btn btn-yellow btn-lg" href="{{ sell_file }}">내차팔기 상담</a>
+      <a class="sellband-phone" href="tel:{{ site.phone_tel }}">{{ icon('phone', 18) }} {{ site.phone }}</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

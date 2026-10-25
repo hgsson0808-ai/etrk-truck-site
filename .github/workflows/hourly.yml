@@ -1,0 +1,40 @@
+name: 매물 갱신 (하루 2번)
+on:
+  schedule:
+    - cron: "0 0,5 * * *"      # 한국시간 오전 9시·오후 2시 (UTC 0·5시). GitHub 사정으로 몇 분 늦을 수 있음
+  workflow_dispatch:
+    inputs:
+      full:
+        description: "전체 다시 받기"
+        type: boolean
+        default: false
+concurrency:
+  group: listings
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: 작은 사진 캐시
+        uses: actions/cache@v4
+        with:
+          path: data/thumbs
+          key: thumbs-${{ github.run_id }}
+          restore-keys: thumbs-
+      - name: 매물 갱신
+        env:
+          GIT_NAME: github-actions[bot]
+          GIT_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        run: |
+          # 매일 새벽 3시(한국시간, UTC 18시)와 수동 '전체' 실행 때는 전체 다시 받기
+          if [ "$(date -u +%H)" = "18" ] || [ "${{ inputs.full }}" = "true" ]; then export FULL=1; fi
+          bash daily.sh

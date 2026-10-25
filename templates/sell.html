@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ site.get('seo',{}).get('sell_title','중고화물차 매입·내차팔기 | __BRAND__') }}{% endblock %}
+{% block desc %}{{ site.get('seo',{}).get('sell_desc','화물차·특장차 매입은 __BRAND__') }} {{ site.phone }}{% endblock %}
+{% block main %}
+<h1 class="vh">중고화물차 매입 · 내차팔기 | __BRAND__</h1>
+
+<div class="wrap sell-one">
+  <section class="sell-form" aria-label="내차팔기 문의 입력">
+    <form id="sell" novalidate>
+      <label for="s-car"><span>차종·톤수 <b class="req">필수</b></span><input id="s-car" name="car" placeholder="예: 마이티 3.5톤 윙바디" required></label>
+      <label for="s-plate">차량번호<input id="s-plate" name="plate" placeholder="예: 80가1234"></label>
+      <label for="s-km">주행거리<input id="s-km" name="km" inputmode="numeric" placeholder="예: 320,000km"></label>
+      <label for="s-area">차량 위치<input id="s-area" name="area" placeholder="예: 경기 평택"></label>
+      <label for="s-memo">특이사항<textarea id="s-memo" name="memo" rows="3" placeholder="특장 사양, 사고 이력, 압류·저당 등"></textarea></label>
+      <p class="form-err" data-form-err role="alert" hidden></p>
+      <button class="btn btn-yellow btn-lg" type="submit">문자로 보내기</button>
+    </form>
+    <a hidden data-sms href="sms:{{ site.phone_tel }}"></a>
+  </section>
+</div>
+{% endblock %}
