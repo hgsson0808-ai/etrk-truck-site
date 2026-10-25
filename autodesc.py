@@ -12,9 +12,15 @@ def name_of(c):
     return " ".join(x for x in (c.get("maker"), c.get("model"), f"{c['ton']}톤", c["type"]) if x)
 
 
+def _own_brand(t):
+    """원본 판매글에 들어 있는 다른 사이트 상호(대성트럭·동부트럭)를 이 사이트 상호로 바꿔 보여 준다."""
+    return t.replace("대성트럭", SITE["name"]).replace("동부트럭", SITE["name"])
+
+
 def seller_lines(c):
     out = []
     for l in c.get("desc", []):
+        l = _own_brand(l)
         if ":" in l:
             k, v = (s.strip() for s in l.split(":", 1))
             if k in HIDE_KEYS or not v: continue
