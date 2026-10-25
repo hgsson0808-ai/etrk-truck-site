@@ -1,0 +1,8 @@
+/style.css
+  Cache-Control: public, max-age=31536000, immutable
+/app.js
+  Cache-Control: public, max-age=31536000, immutable
+/img/*
+  Cache-Control: public, max-age=604800
+/cars.json
+  Cache-Control: public, max-age=3600
