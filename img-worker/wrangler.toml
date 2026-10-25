@@ -1,6 +1,6 @@
 # 매물 사진 중계: img.내도메인/<이름>/<카매니저 사진 경로> → 카매니저 사진 서버에서 가져와 Cloudflare에 저장(캐시)
 # 바꿀 곳: name(아무 영어 이름), routes 의 pattern(brand.json img_host 의 주소에서 https:// 뺀 것)
-name = "dongbu-truck-img"
+name = "etrk-truck-img"
 main = "src/index.js"
 compatibility_date = "2026-10-01"
 workers_dev = false
