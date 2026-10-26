@@ -128,6 +128,7 @@ def main():
     print(f"목록 {len(cards)}대 ({time.time()-t0:.0f}초)", flush=True)
     if limit: cards = cards[:limit]
     out, fails = [], []
+    prev_all = {r["enc"]: r for r in json.load(open(OUT, encoding="utf-8"))} if os.path.exists(OUT) else {}
     if "--quick" in sys.argv and os.path.exists(OUT):  # 빠른 확인: 목록 카드 글(가격·주행거리 등)이 그대로인 매물은 상세를 다시 받지 않음
         prev = {r["enc"]: r for r in json.load(open(OUT, encoding="utf-8"))}
         keep = [c for c in cards if c["enc"] in prev and prev[c["enc"]].get("card") == c["card"]]
@@ -142,7 +143,12 @@ def main():
             try:
                 out.append(parse(c["card"], fu.result()))
             except Exception as e:
-                fails.append((c["enc"], str(e)[:80]))
+                try:  # 한 번 더 받아 본다
+                    time.sleep(3); out.append(parse(c["card"], scrape.detail(c["enc"])))
+                except Exception as e2:
+                    fails.append((c["enc"], str(e2)[:80]))
+                    # 상세를 못 받았다고 매물 페이지가 사라지지 않게, 지난번에 받아 둔 정보를 그대로 둔다 (다음 갱신 때 다시 받음)
+                    if c["enc"] in prev_all: out.append(prev_all[c["enc"]])
             if i % 100 == 0: print(f"  상세 {i}/{len(cards)} ({time.time()-t0:.0f}초)", flush=True)
     recheck(out)
     json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False)
