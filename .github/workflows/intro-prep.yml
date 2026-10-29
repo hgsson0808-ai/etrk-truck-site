@@ -1,0 +1,49 @@
+name: 소개글 사진 준비
+# 소개글 없는 매물의 사진·사진시트·판매정보를 모아 intro-work 브랜치에 올린다.
+# (클로드 작업 공간은 사진 서버에 직접 접속할 수 없어서, GitHub이 대신 받아 둔다)
+on:
+  schedule:
+    - cron: "30 0,5 * * *"      # 매물 갱신 30분 뒤(한국시간 9시 30분·14시 30분)에 사진 준비
+  workflow_dispatch:
+    inputs:
+      n:
+        description: "준비할 매물 수"
+        default: "20"
+concurrency:
+  group: intro-prep
+  cancel-in-progress: true
+permissions:
+  contents: write
+jobs:
+  prep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: 사진 준비
+        env:
+          W: ${{ github.workspace }}/work
+        run: |
+          python3 intro/prep.py "${{ inputs.n || '30' }}" | tee work-log.txt
+          # 개별 사진은 1024px 그대로 두면 무거워서 900px로 줄임 (글씨 읽기엔 충분)
+          python3 - <<'EOF'
+          import os, glob
+          from PIL import Image
+          for f in glob.glob("work/*/*.jpg"):
+              try:
+                  im = Image.open(f).convert("RGB"); im.thumbnail((900, 900)); im.save(f, quality=78)
+              except Exception: pass
+          EOF
+          cp work-log.txt work/LIST.txt
+      - name: intro-work 브랜치에 올리기
+        run: |
+          cd work
+          git init -q -b intro-work
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -qm "소개글 사진 준비 $(TZ=Asia/Seoul date '+%F %H:%M')"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" intro-work
