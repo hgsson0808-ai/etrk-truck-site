@@ -11,8 +11,20 @@ B = os.environ.get("W", "/tmp/mt-intro"); os.makedirs(B, exist_ok=True)
 N = int(sys.argv[1]) if len(sys.argv) > 1 else 20
 d = [r for r in json.load(open(f"{S}/data/all_raw.json")) if r["handled"]]
 d.sort(key=lambda r: r["id"], reverse=True)
-done = {f[:-5] for f in os.listdir(f"{S}/data/desc") + os.listdir(f"{S}/data/desc-hold")}
+done = {f[:-5] for f in os.listdir(f"{S}/data/desc") if f.endswith(".json")}
+# 보류(desc-hold)는 보류 당시 사진 목록("photos")과 지금 사진이 같을 때만 건너뛴다.
+# 사진이 바뀌면(새로 올라오면) 자동으로 다시 고른다 → 소개글을 쓴 뒤 desc-hold 파일을 지울 것.
+photos_now = {r["id"]: r["photos"] for r in d}
+rehold = []
+for f in os.listdir(f"{S}/data/desc-hold"):
+    if not f.endswith(".json"): continue
+    i = f[:-5]
+    try: h = json.load(open(f"{S}/data/desc-hold/{f}"))
+    except Exception: h = {}
+    if i in photos_now and "photos" in h and h["photos"] != photos_now[i]: rehold.append(i)
+    else: done.add(i)
 pick = [r for r in d if r["id"] not in done and len(r["photos"]) >= 3][:N]
+if rehold: print("사진 바뀐 보류 매물(다시 고름):", ",".join(i for i in rehold if any(r["id"] == i for r in pick)) or "없음(이번 회차 밖)")
 try: font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 40)
 except Exception: font = ImageFont.load_default()
 jobs = [(r["id"], n, p) for r in pick for n, p in enumerate(r["photos"][:16], 1)]
@@ -36,6 +48,8 @@ for r in pick:
     sh.save(f"{B}/sheet-{i}.jpg", quality=80)
     facts = {k: r.get(k) for k in ("id", "type", "maker", "model", "ton", "year", "firstReg", "km", "price", "tm", "fuel", "color", "plate", "seizure", "mortgage", "title_hint", "desc")}
     facts["n_photos"] = len(fs)
+    facts["photos"] = r["photos"]          # 보류할 때 desc-hold 파일에 그대로 넣는다 (사진 변경 감지용)
+    facts["held_before"] = os.path.exists(f"{S}/data/desc-hold/{i}.json")
     json.dump(facts, open(f"{B}/facts-{i}.json", "w"), ensure_ascii=False, indent=1)
 print("고름", len(pick), "대 / 남은 소개글 없는 매물", len([r for r in d if r["id"] not in done]) - len(pick), "대 (사진 2장 이하 포함)")
 print(",".join(r["id"] for r in pick) or "NONE")
