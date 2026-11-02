@@ -265,3 +265,9 @@
 
 
 })();
+
+// 구글애즈 전환: 전화번호(tel:) 누르면 '홈페이지 전화번호 클릭' 전환으로 보고 (전화 거는 동작은 그대로)
+document.addEventListener('click', function (e) {
+  var a = e.target && e.target.closest ? e.target.closest('a[href^="tel:"]') : null;
+  if (a && window.ADS_CALL && typeof window.gtag === 'function') window.gtag('event', 'conversion', { 'send_to': window.ADS_CALL });
+}, true);
