@@ -6,6 +6,8 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 python3 -c "import requests, bs4, jinja2, PIL" 2>/dev/null || pip install -q -r requirements.txt --break-system-packages
+export GIT_AUTHOR_NAME="${GIT_NAME:-truck-site-bot}" GIT_AUTHOR_EMAIL="${GIT_EMAIL:-bot@users.noreply.github.com}"
+export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME" GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"   # 올릴 때 rebase 가 이름 없다고 실패하지 않게
 git pull -q --rebase origin main || true
 if [ -n "${FULL:-}" ]; then python3 sync.py; else python3 sync.py --quick; fi
 python3 build.py site | tail -3
