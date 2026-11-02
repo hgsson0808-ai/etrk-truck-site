@@ -29,9 +29,10 @@
 <link rel="stylesheet" href="style.css?v={{ asset_v }}">
 <script type="application/ld+json">{{ jsonld(dealer_ld)|safe }}</script>
 {% block ld %}{% endblock %}
-{% if mode == 'site' and site.ga4_id %}
-<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.ga4_id }}"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','{{ site.ga4_id }}');{% if site.google_ads_id %}gtag('config','{{ site.google_ads_id }}');{% endif %}</script>
+{% if mode == 'site' and (site.ga4_id or site.google_ads_id) %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_ads_id or site.ga4_id }}"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());{% if site.ga4_id %}gtag('config','{{ site.ga4_id }}');{% endif %}{% if site.google_ads_id %}gtag('config','{{ site.google_ads_id }}');{% endif %}</script>
 {% endif %}
 {% if not bare %}
 </head>
