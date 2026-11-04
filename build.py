@@ -448,7 +448,7 @@ def main():
         items = "".join(
             f"<item><title>{xe(c['seo_title'] + ' ' + c['price_txt'])}</title><link>{xe(SITE['domain'] + '/' + quote(c['file'][:-5]))}</link>"
             f"<guid>{xe(SITE['domain'] + '/' + quote(c['file'][:-5]))}</guid><description>{xe(c['meta'])}</description>"
-            f"<enclosure url=\"{xe(c['imgs'][c['cover'] - 1])}\" type=\"image/jpeg\" length=\"0\"/><pubDate>{rfc(c['first_seen'])}</pubDate></item>\n"
+            + (f"<enclosure url=\"{xe(c['imgs'][c['cover'] - 1])}\" type=\"image/jpeg\" length=\"0\"/>" if c['imgs'] and 0 < c['cover'] <= len(c['imgs']) else "") + f"<pubDate>{rfc(c['first_seen'])}</pubDate></item>\n"
             for c in sorted(cars, key=lambda c: c["first_seen"], reverse=True))
         open(os.path.join(OUT, "rss.xml"), "w", encoding="utf-8").write(
             f'<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0"><channel><title>{SITE['name']} 중고화물차 매물</title>'
