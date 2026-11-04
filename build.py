@@ -369,6 +369,12 @@ def main():
     hero = cars[0]
     write(INDEX_FILE, "home.html", cars=cars[:HOME_N], by_type=by_type, total=len(cars), hero=hero, type_blurb=TYPE_BLURB)
     write(LIST_FILE, "list.html", by_type=OrderedDict((t, by_type[t]) for t in ALL_TYPES + [x for x in by_type if x not in ALL_TYPES] if t in by_type), total=len(cars), type_blurb=TYPE_BLURB, per_type=LIST_N)
+    # 톤수별 모아보기 페이지 (광고 도착 페이지·검색용)
+    for tkey, tlabel, tslug in TON_BUCKETS:
+        if tkey == "1": continue
+        bt = OrderedDict((t, [c for c in by_type[t] if c["ton_bucket"] == tkey]) for t in ALL_TYPES + [x for x in by_type if x not in ALL_TYPES] if t in by_type and any(c["ton_bucket"] == tkey for c in by_type[t]))
+        n = sum(len(v) for v in bt.values())
+        if n: write(f"톤수-{tslug}.html", "list.html", by_type=bt, total=n, type_blurb=TYPE_BLURB, per_type=LIST_N, ton_label=tlabel, ton_key=tkey)
     # 첫 화면 검색·톤수·정렬용 전체 매물 목록 (필요할 때만 불러옴)
     def link(f): return f[:-5] if MODE == "site" else f
     idx = [{"f": link(c["file"]), "t": c["card_thumb"], "ty": c["type"], "tb": c["ton_bucket"],
