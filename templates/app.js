@@ -271,3 +271,25 @@ document.addEventListener('click', function (e) {
   var a = e.target && e.target.closest ? e.target.closest('a[href^="tel:"]') : null;
   if (a && window.ADS_CALL && typeof window.gtag === 'function') window.gtag('event', 'conversion', { 'send_to': window.ADS_CALL });
 }, true);
+
+// 매물 공유하기: 휴대폰은 카톡·문자 등 공유 창을 띄우고, 안 되면 짧은 주소를 복사해 둔다
+document.addEventListener('click', function (e) {
+  var b = e.target && e.target.closest ? e.target.closest('[data-share]') : null;
+  if (!b) return;
+  var url = b.getAttribute('data-share'), title = b.getAttribute('data-share-title') || document.title;
+  var label = b.innerHTML;
+  function done(msg) { b.innerHTML = msg; setTimeout(function () { b.innerHTML = label; }, 3000); }
+  function copy() {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).then(function () { done('주소를 복사했습니다. 카톡·문자에 붙여 넣으세요'); }, fallback);
+    } else fallback();
+  }
+  function fallback() {
+    var t = document.createElement('textarea'); t.value = url; t.setAttribute('readonly', ''); t.style.position = 'fixed'; t.style.opacity = '0';
+    document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); done('주소를 복사했습니다. 카톡·문자에 붙여 넣으세요'); } catch (x) { done(url); }
+    document.body.removeChild(t);
+  }
+  if (navigator.share) navigator.share({ title: title, text: title, url: url }).catch(function (err) { if (!err || err.name !== 'AbortError') copy(); });
+  else copy();
+});

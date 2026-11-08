@@ -12,6 +12,7 @@ from config import SITE, PERF_URL, is_handled, ton_value, ton_bucket, TON_BUCKET
 import truck_art
 import spec_extract
 import autodesc
+import price_strip
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MODE = sys.argv[1] if len(sys.argv) > 1 else "site"
@@ -169,6 +170,39 @@ _vp = os.path.join(ROOT, "data", "videos.json")
 VIDEOS = json.load(open(_vp, encoding="utf-8")) if os.path.exists(_vp) else {}  # {매물번호: 유튜브 영상 ID}
 
 
+def short_code(i):
+    """매물번호를 36진수로 줄인 공유용 짧은 이름 (2026300343926 → puvawnsm)."""
+    n, a, out = int(i), "0123456789abcdefghijklmnopqrstuvwxyz", ""
+    while n: n, r = divmod(n, 36); out = a[r] + out
+    return out or "0"
+
+
+def short_txt(u):
+    """화면에 보여 줄 짧은 주소 (https:// 빼고, 한글 도메인은 한글로)."""
+    host, _, path = u.split("://", 1)[-1].partition("/")
+    try: host = host.encode("ascii").decode("idna")
+    except Exception: pass
+    return host + "/" + path
+
+
+def short_pages(cars):
+    """/c/{짧은 이름} → 매물 주소로 보내는 작은 페이지 (카톡 미리보기용 제목·사진 포함, 검색에는 안 나오게)."""
+    from urllib.parse import quote
+    d = os.path.join(OUT, "c"); os.makedirs(d, exist_ok=True)
+    e = lambda x: html.escape(str(x), quote=True)
+    for c in cars:
+        full = f"{SITE['domain']}/{quote(c['file'][:-5])}"
+        img = c["imgs"][c["cover"] - 1] if c["imgs"] and 0 < c["cover"] <= len(c["imgs"]) else ""
+        open(os.path.join(d, short_code(c["id"]) + ".html"), "w", encoding="utf-8").write(
+            f'<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>{e(c["seo_title"])}</title>'
+            f'<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">'
+            f'<link rel="canonical" href="{e(full)}"><meta property="og:type" content="website"><meta property="og:site_name" content="{e(SITE["name"])}">'
+            f'<meta property="og:title" content="{e(c["seo_title"])}"><meta property="og:description" content="{e(c["meta"])}">'
+            f'<meta property="og:url" content="{e(full)}">' + (f'<meta property="og:image" content="{e(img)}">' if img else "") +
+            f'<meta http-equiv="refresh" content="0;url={e(full)}"><script>location.replace({json.dumps(full)})</script></head>'
+            f'<body><p><a href="{e(full)}">{e(c["seo_title"])} 매물 보기</a></p></body></html>\n')
+
+
 def load():
     raw = json.load(open(os.path.join(ROOT, "data", "all_raw.json"), encoding="utf-8"))
     raw.sort(key=lambda c: c["id"], reverse=True)  # 매물번호가 클수록 최근 등록
@@ -185,9 +219,12 @@ def load():
         c["ai"] = bool(d)
         c.update(d or autodesc.make(c))
         c["seller"] = autodesc.seller_lines(c)
+        price_strip.apply(c)  # 상세 설명 글에는 가격을 넣지 않음 (가격은 위쪽 가격 칸에만)
         c["photos"] = c["photos"][:MAX_PHOTOS]
         c["n_photos"] = len(c["photos"])
         c["file"] = car_file(c)
+        c["short"] = f"{SITE['domain']}/c/{short_code(c['id'])}"  # 공유용 짧은 주소 (예: truck4060.com/c/puvawnsm)
+        c["short_txt"] = short_txt(c["short"])
         c["type_file"] = type_file(c["type"])
         c["body"] = BODY.get(c["id"], c.get("body", ""))
         c["ton_bucket"], c["ton_label"], _ = ton_bucket(c["ton"], c.get("model", ""), c.get("body", ""))  # 바디 기준
@@ -208,7 +245,7 @@ def load():
         c["img_base"] = base_name
         heads = {sec["photo"]: sec["heading"] for sec in c["sections"]}
         label = autodesc.name_of(c)
-        c["imgs"] = [f"{IMG_HOST}/{quote(base_name + '-' + format(i, '02d'))}/{p}" for i, p in enumerate(c["photos"], 1)]
+        c["imgs"] = [f"{IMG_HOST}/{quote(base_name + '-' + format(i, '02d'))}/{p}?v=2" for i, p in enumerate(c["photos"], 1)]  # ?v=2: 예전에 깨진 채 저장된 사진 대신 새로 받게
         c["thumbs"] = c["imgs"]  # 상세 사진 아래 작은 사진 (원본 사용, 늦게 불러오기)
         c["card_thumb"] = f"img/t/{c['id']}.webp"  # 목록 카드용 작은 사진 (빌드 때 만듦)
         c["alts"] = [f"{label} {c['year']}년식 {heads.get(i, '사진 ' + str(i))}" for i in range(1, c["n_photos"] + 1)]
@@ -291,10 +328,11 @@ def main():
     os.makedirs(OUT)
     cars, skipped = load()
     sold, changed = track(cars)
+    for c in sold: price_strip.apply(c)  # 판매완료 페이지 설명 글에도 가격을 넣지 않음
     for c in sold: c.setdefault("card_thumb", c["imgs"][c["cover"] - 1])
     bad = photos(cars + sold)
     for c in cars + sold:
-        if c["id"] in bad: c["card_thumb"] = c["imgs"][c["cover"] - 1]
+        if c["id"] in bad and c.get("imgs"): c["card_thumb"] = c["imgs"][min(max(c["cover"], 1), len(c["imgs"])) - 1]  # 대표 사진 번호가 사진 수보다 크면 마지막 사진
     truck_art.write_all(os.path.join(OUT, 'img', 'types'))
     if not os.path.exists(os.path.join(ROOT, 'data', 'brand', 'logo.png')): text_logo()  # 로고 파일이 없으면 업체명 글자 로고를 만든다
     shutil.copy(os.path.join(ROOT, 'data', 'brand', 'logo.png'), os.path.join(OUT, 'img', 'logo.png'))
@@ -468,6 +506,7 @@ def main():
             _cur = {c["file"] for c in cars + sold}
             _rl = [f"/{quote(o[:-5])} /{quote(n[:-5])} 301" for o, n in json.load(open(_rp, encoding="utf-8")).items() if n in _cur]
             open(os.path.join(OUT, "_redirects"), "w", encoding="utf-8").write("\n".join(_rl) + "\n")
+        short_pages(cars)  # 공유용 짧은 주소 /c/…
         open(os.path.join(OUT, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE['domain']}/sitemap.xml\n")
         # IndexNow: 키 파일 + 이번 빌드에서 바뀐 주소 목록 (업로드 후 indexnow.py로 전송)
         kp = os.path.join(ROOT, "data", "indexnow_key.txt")

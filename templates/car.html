@@ -89,6 +89,8 @@
     <div class="cta-col">
       <a class="btn btn-yellow btn-lg" href="tel:{{ site.phone_tel }}">{{ icon('phone', 20) }} 전화 상담 {{ site.phone }}</a>
       <a class="btn btn-ghost" href="sms:{{ site.phone_tel }}?body={{ sms_body|urlencode }}&amp;body={{ sms_body|urlencode }}">{{ icon('sms', 18) }} 문자로 문의하기</a>
+      {% if c.short and not sold %}<button type="button" class="btn btn-ghost btn-share" data-share="{{ c.short }}" data-share-title="{{ c.seo_title }}">{{ icon('share', 18) }} 매물 공유하기</button>
+      <p class="share-url">카톡·문자로 보낼 주소 <b>{{ c.short_txt }}</b></p>{% endif %}
     </div>
     <a class="perf-link" href="{{ c.perf_url }}" target="_blank" rel="noopener">{{ icon('doc', 18) }}<span>성능·상태점검기록부 보기<small>성능번호 {{ c.perfNo }}</small></span></a>
     <p class="mini-dealer">{{ icon('user', 16) }} 담당 {{ site.dealer.name }} · 사원증 {{ site.dealer.card_no }}</p>
