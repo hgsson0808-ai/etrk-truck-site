@@ -60,7 +60,7 @@
   "ga4_id": "",
   "google_ads_id": "AW-18549093937",
   "google_ads_call_label": "a4QZCPS0qrAdELHs8oxF",
-  "google_ads_sms_label": "",
+  "google_ads_sms_label": "r31TCMmeqLQdELHs8oxF",
   "_google_ads_설명": "google_ads_id = 구글애즈 Google 태그. google_ads_call_label = 전환 액션 '홈페이지 전화번호 클릭'의 라벨(전화번호 누르면 전환으로 보고). google_ads_sms_label = 전환 액션 '홈페이지 문자 클릭'의 라벨(문자 버튼·내차팔기 문자 보내기 누르면 전환). 비우면 보고 안 함.",
   "naver_site_verification": "b24e6b349fe0e9d283f4e4fbcdcc5ec6cc5a1663",
   "google_site_verification": "",
