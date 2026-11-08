@@ -408,6 +408,16 @@ def main():
               ton_links=links, type_link=type_file(t), noindex=not cs, lastmod=lm)  # 매물 0대 → 검색 제외
     for (t, key), cs in combos.items():
         ton_page(t, key, cs, lastmod=max(c["lastmod"] for c in cs))
+    # 2.5~3.5톤(중소형) 합본 페이지 — 광고 도착 페이지용: 차종-2.5-3.5톤-{차종}, 톤수-2.5-3.5톤
+    mid_keys = {"2.5", "3.5"}
+    for t in ALL_TYPES + [x for x in by_type if x not in ALL_TYPES]:
+        cs = [c for c in by_type.get(t, []) if c["ton_bucket"] in mid_keys]
+        if cs:
+            exact = "·".join(f"{x}톤" for x in sorted({c["ton"] for c in cs}, key=ton_value))
+            write(f"차종-2.5-3.5톤-{t}.html", "type.html", t=t, ton="2.5~3.5톤", ton_note=exact, cars=cs,
+                  blurb=TYPE_BLURB.get(t, ""), ton_links=[], type_link=type_file(t), lastmod=max(c["lastmod"] for c in cs))
+    bt = OrderedDict((t, [c for c in by_type[t] if c["ton_bucket"] in mid_keys]) for t in ALL_TYPES + [x for x in by_type if x not in ALL_TYPES] if t in by_type and any(c["ton_bucket"] in mid_keys for c in by_type[t]))
+    if bt: write("톤수-2.5-3.5톤.html", "list.html", by_type=bt, total=sum(len(v) for v in bt.values()), type_blurb=TYPE_BLURB, per_type=LIST_N, ton_label="2.5~3.5톤", ton_key="2.5")
     for c in sold:  # 판매로 0대가 된 톤수 페이지는 404 대신 검색 제외로 유지
         if (c["type"], c.get("ton_bucket")) not in combos:
             combos[(c["type"], c["ton_bucket"])] = []
