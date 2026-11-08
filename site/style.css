@@ -865,6 +865,15 @@ button.chip.on:hover { color: #fff; border-color: var(--teal-dark); background: 
 .g-list span { color: var(--muted); font-size: 1rem; line-height: 1.5; }
 .guide .notice .btn { margin-top: 4px; }
 
+/* 차종 화면 톤수 버튼·포함 톤수: 크고 진하게 (어르신도 잘 보이게) */
+.chips-row .chip { min-height: 48px; padding: 0 18px; font-size: 1.08rem; font-weight: 800; color: var(--teal-dark); background: var(--teal-pale); border: 2px solid var(--teal); }
+a.chip:hover, .chips-row .chip:hover { background: var(--teal); border-color: var(--teal); color: var(--on-teal, #fff); }
+.ton-note { display: inline-block; margin: 8px 0 0; padding: 6px 14px; border-radius: 8px; font-size: 1.08rem; font-weight: 800; color: var(--teal-dark); background: var(--teal-pale); }
+/* 매물 공유하기 (문자로 문의하기 밑) */
+.btn-share { width: 100%; cursor: pointer; font: inherit; font-weight: 700; }
+.share-url { margin: 2px 0 0; font-size: .92rem; color: var(--muted); text-align: center; word-break: break-all; }
+.share-url b { display: block; font-size: 1.02rem; color: var(--ink, #1a1a1a); font-weight: 700; }
+
 :root {--teal: #ed6d00; --teal-btn: #d16000; --teal-dark: #b25200; --teal-pale: #fdede0; --soft: #fef5ed; --navy: #a34300; --navy-2: #a34300;}
 .hero2 { background: linear-gradient(115deg, #3e1900 0%, #5a2500 55%, #823600 100%) !important; }
 .hero2::before, .h2-slide::before { background: linear-gradient(90deg, rgba(62,25,0,0.96) 0%, rgba(90,37,0,0.88) 38%, rgba(90,37,0,0.4) 62%, rgba(90,37,0,0) 82%) !important; }
