@@ -34,6 +34,7 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_ads_id or site.ga4_id }}"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());{% if site.ga4_id %}gtag('config','{{ site.ga4_id }}');{% endif %}{% if site.google_ads_id %}gtag('config','{{ site.google_ads_id }}');{% endif %}</script>
 {% if site.google_ads_call_label %}<script>window.ADS_CALL='{{ site.google_ads_id }}/{{ site.google_ads_call_label }}';</script>{% endif %}
+{% if site.google_ads_sms_label %}<script>window.ADS_SMS='{{ site.google_ads_id }}/{{ site.google_ads_sms_label }}';</script>{% endif %}
 {% endif %}
 {% if not bare %}
 </head>

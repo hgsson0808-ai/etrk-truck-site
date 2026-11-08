@@ -259,6 +259,7 @@
       if (f.area.value.trim()) lines.push('차량 위치: ' + f.area.value.trim());
       if (f.memo.value.trim()) lines.push('특이사항: ' + f.memo.value.trim());
       var enc = encodeURIComponent(lines.join('\n'));
+      if (typeof adsConv === 'function') adsConv(window.ADS_SMS);  // 내차팔기 '문자로 보내기'도 문자 전환
       location.href = sms.getAttribute('href').split('?')[0] + '?body=' + enc + '&body=' + enc;
     });
   }
@@ -266,10 +267,12 @@
 
 })();
 
-// 구글애즈 전환: 전화번호(tel:) 누르면 '홈페이지 전화번호 클릭' 전환으로 보고 (전화 거는 동작은 그대로)
+// 구글애즈 전환: 전화번호(tel:)를 누르면 '홈페이지 전화번호 클릭', 문자(sms:)를 누르면 '홈페이지 문자 클릭' 전환으로 보고 (전화·문자 앱 여는 동작은 그대로)
+function adsConv(to) { if (to && typeof window.gtag === 'function') window.gtag('event', 'conversion', { 'send_to': to, 'transport_type': 'beacon' }); }
 document.addEventListener('click', function (e) {
-  var a = e.target && e.target.closest ? e.target.closest('a[href^="tel:"]') : null;
-  if (a && window.ADS_CALL && typeof window.gtag === 'function') window.gtag('event', 'conversion', { 'send_to': window.ADS_CALL });
+  var a = e.target && e.target.closest ? e.target.closest('a[href^="tel:"], a[href^="sms:"]') : null;
+  if (!a) return;
+  adsConv(a.getAttribute('href').indexOf('sms:') === 0 ? window.ADS_SMS : window.ADS_CALL);
 }, true);
 
 // 매물 공유하기: 휴대폰은 카톡·문자 등 공유 창을 띄우고, 안 되면 짧은 주소를 복사해 둔다
