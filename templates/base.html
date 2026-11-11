@@ -27,6 +27,8 @@
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="apple-touch-icon" href="img/favicon.png">
 <link rel="stylesheet" href="style.css?v={{ asset_v }}">
+{# 서버가 멀어(해외 경유) 첫 응답이 느리므로, 손님이 링크에 손가락·마우스를 올리는 순간 다음 페이지를 미리 받아 둔다 (크롬·엣지·삼성인터넷) #}
+<script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/c/*"}}]},"eagerness":"moderate"},{"where":{"selector_matches":"nav a"},"eagerness":"eager"}]}</script>
 <script type="application/ld+json">{{ jsonld(dealer_ld)|safe }}</script>
 {% block ld %}{% endblock %}
 {% if mode == 'site' and (site.ga4_id or site.google_ads_id) %}
