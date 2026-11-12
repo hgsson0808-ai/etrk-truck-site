@@ -329,7 +329,7 @@ def main():
     cars, skipped = load()
     sold, changed = track(cars)
     for c in sold: price_strip.apply(c)  # 판매완료 페이지 설명 글에도 가격을 넣지 않음
-    for c in sold: c.setdefault("card_thumb", c["imgs"][c["cover"] - 1])
+    for c in sold: c.setdefault("card_thumb", c["imgs"][min(max(c["cover"], 1), len(c["imgs"])) - 1] if c.get("imgs") else "")  # 대표 사진 번호가 사진 수보다 커도 멈추지 않게
     bad = photos(cars + sold)
     for c in cars + sold:
         if c["id"] in bad and c.get("imgs"): c["card_thumb"] = c["imgs"][min(max(c["cover"], 1), len(c["imgs"])) - 1]  # 대표 사진 번호가 사진 수보다 크면 마지막 사진
