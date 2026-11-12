@@ -26,7 +26,8 @@ def to_type(category, text):
     if "활어" in c: return "활어차"
     if "홈로리" in c or "탱크로리" in c: return "탱크로리"
     if "기타액체" in c: return "탱크로리"
-    if "고소작업" in c: return "바가지차" if "바가지" in t else "고소작업차"
+    # 스카이차는 고소작업차. 판매자가 모든 매물 설명에 붙이는 취급 차종 안내 줄("카고크레인 바가지차 집게차")의 '바가지' 글자는 보지 않는다
+    if "고소작업" in c: return "바가지차" if "바가지" in re.sub(r"카고크레인\s*바가지차\s*집게차", " ", t) and "스카이" not in t else "고소작업차"
     if "카고크레인" in c: return "카고크레인"
     if "집게" in c: return "집게차"
     if "셀프" in c: return "셀프로더"
