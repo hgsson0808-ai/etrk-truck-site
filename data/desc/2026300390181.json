@@ -59,5 +59,6 @@
   "요소수 게이지 낮음",
   "사진 5장 — 1,000자 미만"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

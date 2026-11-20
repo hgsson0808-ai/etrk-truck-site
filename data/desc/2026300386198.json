@@ -65,5 +65,6 @@
   "탱크 용량·펌프 모델 표기 없음",
   "하체·배관 녹 다수"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

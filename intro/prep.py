@@ -11,7 +11,17 @@ B = os.environ.get("W", "/tmp/mt-intro"); os.makedirs(B, exist_ok=True)
 N = int(sys.argv[1]) if len(sys.argv) > 1 else 20
 d = [r for r in json.load(open(f"{S}/data/all_raw.json")) if r["handled"]]
 d.sort(key=lambda r: r["id"], reverse=True)
+# 1번 대성트럭에 사장님이 상세설명(desc)을 입력한 매물만 쓴다. 비었거나 "@@"뿐이면 아직 미입력 → 고르지 않는다.
+def has_desc(r): return any((x or "").strip() not in ("", "@@") for x in (r.get("desc") or []))
+no_desc = [r["id"] for r in d if not has_desc(r)]
+d = [r for r in d if has_desc(r)]
 done = {f[:-5] for f in os.listdir(f"{S}/data/desc") if f.endswith(".json")}
+# 상세설명 없이 썼던 소개글("seller_desc_missing": true)은 상세설명이 들어오면 다시 쓴다 → facts 에 "rewrite": true
+rewrite = []
+for i in list(done):
+    try: w = json.load(open(f"{S}/data/desc/{i}.json"))
+    except Exception: continue
+    if w.get("seller_desc_missing") and any(r["id"] == i for r in d): done.discard(i); rewrite.append(i)
 # 보류(desc-hold)는 보류 당시 사진 목록("photos")과 지금 사진이 같을 때만 건너뛴다.
 # 사진이 바뀌면(새로 올라오면) 자동으로 다시 고른다 → 소개글을 쓴 뒤 desc-hold 파일을 지울 것.
 photos_now = {r["id"]: r["photos"] for r in d}
@@ -25,6 +35,7 @@ for f in os.listdir(f"{S}/data/desc-hold"):
     else: done.add(i)
 pick = [r for r in d if r["id"] not in done and len(r["photos"]) >= 3][:N]
 if rehold: print("사진 바뀐 보류 매물(다시 고름):", ",".join(i for i in rehold if any(r["id"] == i for r in pick)) or "없음(이번 회차 밖)")
+if rewrite: print("상세설명 들어와 다시 쓰는 매물:", ",".join(i for i in rewrite if any(r["id"] == i for r in pick)) or "없음(이번 회차 밖)")
 try: font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 40)
 except Exception: font = ImageFont.load_default()
 jobs = [(r["id"], n, p) for r in pick for n, p in enumerate(r["photos"][:16], 1)]
@@ -50,6 +61,7 @@ for r in pick:
     facts["n_photos"] = len(fs)
     facts["photos"] = r["photos"]          # 보류할 때 desc-hold 파일에 그대로 넣는다 (사진 변경 감지용)
     facts["held_before"] = os.path.exists(f"{S}/data/desc-hold/{i}.json")
+    facts["rewrite"] = i in rewrite             # 상세설명 없이 썼던 소개글 → 새로 써서 덮어쓸 것
     json.dump(facts, open(f"{B}/facts-{i}.json", "w"), ensure_ascii=False, indent=1)
-print("고름", len(pick), "대 / 남은 소개글 없는 매물", len([r for r in d if r["id"] not in done]) - len(pick), "대 (사진 2장 이하 포함)")
+print("고름", len(pick), "대 / 남은 소개글 없는 매물", len([r for r in d if r["id"] not in done]) - len(pick), "대 (사진 2장 이하 포함) / 상세설명 미입력 대기", len(no_desc), "대")
 print(",".join(r["id"] for r in pick) or "NONE")

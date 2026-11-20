@@ -84,5 +84,6 @@
   "연식 2015 / 최초등록 2014-11-25 — 확인 필요",
   "계기판 501,221km ≈ 판매 정보"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

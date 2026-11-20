@@ -87,5 +87,6 @@
   "사인보드 제조사 표기 없음",
   "동일 사양 823다4959(2026300387403) 별도"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

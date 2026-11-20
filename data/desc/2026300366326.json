@@ -95,5 +95,6 @@
   "암롤 장비 제작사 명판 사진 없음, 용량 판매 정보 없음",
   "사진 15 칼럼식 변속 레버 A/M 표기 — 자동 변속(AMT)"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

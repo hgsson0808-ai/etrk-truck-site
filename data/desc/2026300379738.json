@@ -83,5 +83,6 @@
   "계기판 54,387km (판매 정보 54,310km)",
   "뒷문 적재량 표기 숫자 판독 불확실"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

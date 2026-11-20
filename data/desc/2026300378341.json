@@ -88,5 +88,6 @@
   "적재함에 짐 실린 상태로 촬영",
   "윙 캔버스 주름"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

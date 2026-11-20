@@ -89,5 +89,6 @@
   "계기판 3,820km (판매 정보 3,792km)",
   "파워게이트 모델명 미확인"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

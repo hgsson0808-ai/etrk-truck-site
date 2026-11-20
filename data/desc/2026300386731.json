@@ -95,5 +95,6 @@
   "최대적재량 2,400kg, 제작사 전화번호 본문 제외",
   "탑 치수 표기 없음"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

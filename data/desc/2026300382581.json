@@ -83,5 +83,6 @@
   "계기판 사진 없음",
   "운전석 시트 방석 찢어짐"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

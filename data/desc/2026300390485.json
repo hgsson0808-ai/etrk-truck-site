@@ -65,5 +65,6 @@
   "계기판 주황색 표시등 켜짐",
   "사진 6장 — 1,000자 미만"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

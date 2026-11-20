@@ -92,5 +92,6 @@
   "뒷문 최대적재량 3,500kg",
   "사진 02 제외(06과 비슷)"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

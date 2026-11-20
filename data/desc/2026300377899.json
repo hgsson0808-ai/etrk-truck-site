@@ -96,5 +96,6 @@
   "앞 1축 + 뒤 2축 대형 캡 프리마 14톤 → body L 로 기재",
   "사진 14 시트 사이 박스는 냉온장고로 보이나 확인 필요"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

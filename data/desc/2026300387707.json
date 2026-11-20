@@ -90,5 +90,6 @@
   "계기판 1,826km facts 일치",
   "적재함 길이 표기 없음"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

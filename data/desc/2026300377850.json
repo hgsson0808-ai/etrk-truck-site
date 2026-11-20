@@ -91,5 +91,6 @@
   "도어 배지 GOLD · 5ton · EURO6 · G280 (사진 01·11)",
   "적재함 치수 판매 정보 없음 — 본문에 수치 미기재"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

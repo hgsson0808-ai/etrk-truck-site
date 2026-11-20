@@ -95,5 +95,6 @@
   "title_hint '이상' 의미 불명",
   "사진 03·09·10·11 제외"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

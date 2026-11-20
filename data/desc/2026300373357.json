@@ -83,5 +83,6 @@
   "사진 14 적재함 하부 둥근 부품은 용도 불명(센서로 보임) — 본문에 단정 안 함",
   "적재함 치수 판매 정보 없음"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }

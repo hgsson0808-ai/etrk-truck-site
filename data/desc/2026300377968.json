@@ -94,5 +94,6 @@
   "연식 2026, 최초등록 2025-06-11",
   "가격 1억 2,600만원"
  ],
- "remote": true
+ "remote": true,
+ "seller_desc_missing": true
 }
