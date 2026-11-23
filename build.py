@@ -205,8 +205,11 @@ def short_pages(cars):
 
 def load():
     raw = json.load(open(os.path.join(ROOT, "data", "all_raw.json"), encoding="utf-8"))
+    noid = [c for c in raw if not c.get("id")]  # 상세에서 매물번호를 못 읽은 매물 → 페이지를 만들 수 없으니 이번엔 건너뜀 (다음 갱신 때 다시 확인)
+    raw = [c for c in raw if c.get("id")]
     raw.sort(key=lambda c: c["id"], reverse=True)  # 매물번호가 클수록 최근 등록
-    cars, skipped = [], []
+    cars, skipped = [], [(c.get("enc", "?"), "매물번호 없음") for c in noid]
+    if noid: print(f"주의: 매물번호를 못 읽은 매물 {len(noid)}대 건너뜀: {[c.get('enc') for c in noid][:5]}", flush=True)
     from urllib.parse import quote
     for c in raw:
         if not c.get("handled"):
