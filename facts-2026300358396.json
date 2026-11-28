@@ -1,0 +1,33 @@
+{
+ "id": "2026300358396",
+ "type": "카고",
+ "maker": "현대",
+ "model": "메가트럭",
+ "ton": "5",
+ "year": 2013,
+ "firstReg": "2012-09-03",
+ "km": 310000,
+ "price": 3800,
+ "tm": "수동",
+ "fuel": "경유",
+ "color": "흰색",
+ "plate": "83우7562",
+ "seizure": "없음",
+ "mortgage": "없음",
+ "title_hint": "초장축 앞축카고",
+ "desc": [
+  "옵션:메가트럭 초장축 앞축카고",
+  "메가트럭 초장축 625적재함",
+  "현대트럭 5톤 앞축카고"
+ ],
+ "n_photos": 5,
+ "photos": [
+  "2026/20261127/EE060FA9263CFC120E9912AC482930AC765E5CC6FD6B3EACF936806DA575C9FA.jpg",
+  "2026/20261127/7CE5FC859E8E9244EADD4069BFFE1EDBDFFA2B28B30EFE704135C6E5621A3468.jpg",
+  "2026/20261127/F912C03D6D8BC928062EB4C0A92E35D05D1D6619EC069E98DE7896E5D7568250.jpg",
+  "2026/20261127/AF2D45AE005379ED0642AEF86DC7763B0518D988F2D88DD7FF8B1D560D317C75.jpg",
+  "2026/20261127/841ADCDB608995B15201D91CA3D3C486022872D2C756B1F2A07007A4FD320462.jpg"
+ ],
+ "held_before": false,
+ "rewrite": false
+}
